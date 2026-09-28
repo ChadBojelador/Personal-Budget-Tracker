@@ -297,7 +297,6 @@ function App() {
               <button onClick={() => setModal('assumptions')}>{Math.round(forecast.confidenceScore * 100)}% confidence <ChevronRight size={14} /></button>
             </div>
             <strong className="safe-amount">{money.format(forecast.safeToSpend)}</strong>
-            <p>{forecast.safeToSpend > 0 ? 'Available for flexible spending without touching your essentials or savings goal.' : 'Pause flexible spending for now. Your protected money already uses the available balance.'}</p>
             <div className="safe-stats">
               <div><span>Total balance</span><strong>{money.format(forecast.currentBalance)}</strong></div>
               <div><span>Needs left</span><strong>{money.format(forecast.remainingEssentials)}</strong></div>
