@@ -4,8 +4,8 @@
 
 The interface is a calm daily budget check-in. Its signature element is one
 plain-language safe-to-spend card that answers the user's first question before
-showing any supporting detail. A contextual suggestion card sits beside it and
-turns the forecast into a small set of useful next steps.
+showing any supporting detail. Everything else is a direct action or a compact
+record of the user's money.
 
 ## Tokens
 
@@ -43,7 +43,7 @@ marketing typography.
 +-------------------------------------------------------------+
 | heading                                      month           |
 |                                                             |
-| [ safe to spend / key numbers ] [ what to do next ]         |
+| [ safe to spend / key numbers                         ]     |
 |                                                             |
 | [ add transaction ] [ daily check-in ] [ check a purchase ] |
 |                                                             |
@@ -62,7 +62,7 @@ supporting account, activity, and budget cards are quieter and list-based.
 - Use light borders and little or no shadow for supporting cards.
 - Vary radius and corner treatment by hierarchy instead of applying one tile
   style everywhere.
-- Keep suggestions to three and pair each one with a direct action.
+- Keep helper copy out of cards when the label and value are self-explanatory.
 - Preserve an opaque fallback for reduced transparency and disable motion when
   the user requests reduced motion.
 
@@ -71,6 +71,6 @@ supporting account, activity, and budget cards are quieter and list-based.
 The earlier dashboard exposed the full model at once: a timeline, coaching,
 accounts, essentials, activity, and wishlist all competed for attention. The
 revision removes the sidebar and timeline from the primary workflow, leads with
-safe-to-spend, and uses contextual suggestions plus three obvious actions.
+safe-to-spend, and follows it with three obvious actions.
 Cards remain because the brief requested them, but hierarchy, corner treatment,
 and content density vary so the result does not read as an identical tile grid.
