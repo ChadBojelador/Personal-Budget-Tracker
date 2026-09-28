@@ -34,4 +34,4 @@ initial UI works with demo data if Supabase is not configured.
 - [`docs/SECURITY.md`](docs/SECURITY.md) — threat model and security controls
 - [`docs/ROADMAP.md`](docs/ROADMAP.md) — phased implementation plan
 - [`docs/DESIGN.md`](docs/DESIGN.md) — visual system and interaction direction
-
+- [`docs/AI.md`](docs/AI.md) — current prediction engine and safe AI boundaries

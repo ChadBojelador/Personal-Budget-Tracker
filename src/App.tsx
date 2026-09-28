@@ -10,18 +10,20 @@ import {
   ListChecks,
   LockKeyhole,
   Menu,
+  Moon,
   PiggyBank,
   Plus,
   Settings,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
+  Sun,
   Utensils,
   WalletCards,
   Wifi,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const money = new Intl.NumberFormat('en-PH', {
   style: 'currency',
@@ -86,7 +88,18 @@ function CheckIn({ open, onClose }: CheckInProps) {
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [checkInOpen, setCheckInOpen] = useState(false)
+  const [theme, setTheme] = useState<'dark' | 'light'>(() =>
+    localStorage.getItem('budget-theme') === 'light' ? 'light' : 'dark',
+  )
   const total = accounts.reduce((sum, account) => sum + account.amount, 0)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('budget-theme', theme)
+
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    themeColor?.setAttribute('content', theme === 'dark' ? '#07101c' : '#f3f7fc')
+  }, [theme])
 
   return (
     <div className="app-shell">
@@ -134,6 +147,14 @@ function App() {
           </div>
           <div className="top-actions">
             <span className="secure-status"><LockKeyhole size={15} />Private vault</span>
+            <button
+              className="icon-button theme-toggle"
+              onClick={() => setTheme((current) => current === 'dark' ? 'light' : 'dark')}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+              title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
             <button className="icon-button" aria-label="Notifications"><Bell size={19} /><i /></button>
             <button className="primary" onClick={() => setCheckInOpen(true)}><Plus size={18} />Add transaction</button>
           </div>

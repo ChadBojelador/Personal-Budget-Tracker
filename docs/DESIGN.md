@@ -9,6 +9,20 @@ used to establish depth and focus, not as decoration on every box.
 
 ## Tokens
 
+Dark mode is the default. Light mode remains available from the dashboard and
+the preference is remembered on the device.
+
+### Night ledger
+
+- `night`: `#07101C` — default page background.
+- `deep glass`: `rgba(13, 26, 42, 0.70)` — layered working surfaces.
+- `moon ink`: `#EDF3FB` — primary text.
+- `mist`: `#94A2B5` — secondary text.
+- `water`: `#2F7CF6` — actions and current position.
+- `mint`: `#36B995` — healthy savings and safe outcomes.
+
+### Daylight
+
 - `cloud`: `#F3F7FC` — cool daylight background.
 - `ink`: `#122033` — primary text with a soft navy cast.
 - `slate`: `#637083` — secondary text.
@@ -54,4 +68,3 @@ The initial direction risked becoming a generic collection of frosted cards.
 It was revised around the spending runway: a financial timeline specific to
 twice-monthly allowance, protected essentials, and a month-end destination.
 Glass now supports that layered timeline instead of defining every component.
-

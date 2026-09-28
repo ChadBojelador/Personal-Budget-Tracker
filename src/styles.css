@@ -190,3 +190,109 @@ h2 { margin: 0; font-size: 17px; letter-spacing: -.018em; }
 @media (prefers-reduced-transparency: reduce) {
   .sidebar, .account, .essentials, .activity, .icon-button { background: #f9fbfd; backdrop-filter: none; }
 }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #edf3fb;
+  background: #07101c;
+  --ink: #edf3fb;
+  --slate: #94a2b5;
+  --line: rgba(207, 225, 245, 0.1);
+  --glass: rgba(15, 28, 45, 0.72);
+  --shadow: 0 24px 70px rgba(0, 4, 11, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] .app-shell { background: #07101c; }
+
+:root[data-theme="dark"] .ambient-one {
+  background: radial-gradient(circle, rgba(48, 113, 199, 0.22), transparent 68%);
+}
+
+:root[data-theme="dark"] .ambient-two {
+  background: radial-gradient(circle, rgba(37, 147, 123, 0.13), transparent 68%);
+}
+
+:root[data-theme="dark"] .sidebar {
+  background: rgba(10, 21, 35, 0.76);
+  border-color: rgba(185, 213, 243, 0.09);
+}
+
+:root[data-theme="dark"] .nav-item { color: #8998aa; }
+:root[data-theme="dark"] .nav-item:hover { color: var(--ink); background: rgba(255, 255, 255, 0.045); }
+:root[data-theme="dark"] .nav-item.active {
+  color: #8bbcff;
+  background: rgba(56, 126, 221, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(116, 170, 244, 0.08);
+}
+
+:root[data-theme="dark"] .check-in-button {
+  background: linear-gradient(135deg, rgba(47, 124, 246, 0.16), rgba(54, 185, 149, 0.1));
+}
+
+:root[data-theme="dark"] .avatar { background: #d9e8fa; color: #0b1727; }
+:root[data-theme="dark"] .icon-button,
+:root[data-theme="dark"] .account,
+:root[data-theme="dark"] .essentials,
+:root[data-theme="dark"] .activity {
+  background: rgba(13, 26, 42, 0.7);
+  border-color: rgba(185, 213, 243, 0.08);
+}
+
+:root[data-theme="dark"] .icon-button {
+  color: #d8e4f2;
+  box-shadow: 0 10px 28px rgba(0, 4, 11, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+:root[data-theme="dark"] .icon-button i { border-color: #07101c; }
+:root[data-theme="dark"] .secondary {
+  color: #dce7f4;
+  background: rgba(20, 37, 58, 0.8);
+  border-color: rgba(185, 213, 243, 0.1);
+}
+
+:root[data-theme="dark"] .runway {
+  border-color: rgba(168, 207, 248, 0.15);
+  background:
+    radial-gradient(circle at 85% 0%, rgba(71, 140, 229, 0.32), transparent 34%),
+    linear-gradient(125deg, rgba(16, 34, 57, 0.98), rgba(24, 59, 98, 0.94));
+  box-shadow: 0 30px 75px rgba(0, 4, 12, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme="dark"] .account.cash .account-symbol { color: #64caae; background: rgba(54, 185, 149, 0.14); }
+:root[data-theme="dark"] .account.gcash .account-symbol { color: #83b6ff; background: rgba(47, 124, 246, 0.15); }
+:root[data-theme="dark"] .account.mari .account-symbol { color: #e7b879; background: rgba(205, 141, 62, 0.14); }
+:root[data-theme="dark"] .add-account { border-color: rgba(185, 213, 243, 0.14); }
+
+:root[data-theme="dark"] .confidence { color: #e5b974; background: rgba(192, 127, 46, 0.16); }
+:root[data-theme="dark"] .essential-icon,
+:root[data-theme="dark"] .activity-icon {
+  color: #92b4ce;
+  background: rgba(88, 126, 158, 0.13);
+}
+
+:root[data-theme="dark"] .progress { background: rgba(194, 216, 239, 0.1); }
+:root[data-theme="dark"] .activity-row > strong.positive { color: #62d0ad; }
+:root[data-theme="dark"] .wishlist-callout {
+  border-color: rgba(185, 213, 243, 0.08);
+  background: linear-gradient(100deg, rgba(18, 38, 63, 0.88), rgba(14, 37, 41, 0.72));
+  box-shadow: 0 18px 48px rgba(0, 4, 11, 0.26);
+}
+
+:root[data-theme="dark"] .wish-icon {
+  color: #8bbcff;
+  background: rgba(72, 133, 218, 0.14);
+  box-shadow: none;
+}
+
+:root[data-theme="dark"] .modal-backdrop { background: rgba(0, 5, 13, 0.58); }
+:root[data-theme="dark"] .check-in {
+  border-color: rgba(185, 213, 243, 0.11);
+  background: rgba(10, 22, 37, 0.95);
+  box-shadow: 0 40px 100px rgba(0, 3, 10, 0.62);
+}
+
+:root[data-theme="dark"] .check-in-row > span {
+  color: #92bdff;
+  background: rgba(47, 124, 246, 0.14);
+}
