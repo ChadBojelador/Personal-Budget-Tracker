@@ -9,7 +9,6 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
-  Cloud,
   CreditCard,
   Database,
   ListChecks,
@@ -17,11 +16,9 @@ import {
   Moon,
   PiggyBank,
   Plus,
-  RefreshCw,
   Settings,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
   Sun,
   Trash2,
   Utensils,
@@ -30,11 +27,10 @@ import {
   X,
 } from 'lucide-react'
 import { type FormEvent, type ReactNode, useMemo, useState } from 'react'
-import { requestAICoaching } from './aiCoach'
 import { appConfig, environmentStatus } from './config'
 import { loadBudgetData, resetBudgetData, saveBudgetData } from './data'
-import { calculateForecast, checkAffordability, createLocalCoaching, currentMonthKey } from './forecast'
-import type { Account, BudgetData, BudgetSettings, CoachResponse, Transaction, WishlistItem } from './types'
+import { calculateForecast, checkAffordability, currentMonthKey } from './forecast'
+import type { Account, BudgetData, BudgetSettings, Transaction, WishlistItem } from './types'
 
 const money = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', maximumFractionDigits: 0 })
 const fullDate = new Intl.DateTimeFormat('en-PH', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -238,19 +234,14 @@ function App() {
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey())
   const [modal, setModal] = useState<Modal>(null)
   const [showAllActivity, setShowAllActivity] = useState(false)
-  const [remoteCoach, setRemoteCoach] = useState<CoachResponse | null>(null)
-  const [coachLoading, setCoachLoading] = useState(false)
-  const [coachError, setCoachError] = useState('')
   const [toast, setToast] = useState('')
   const [theme, setTheme] = useState<'light' | 'dark'>(() => document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
   const forecast = useMemo(() => calculateForecast(data, selectedMonth), [data, selectedMonth])
-  const localCoach = useMemo(() => createLocalCoaching(forecast, data), [forecast, data])
-  const coach = remoteCoach ?? localCoach
   const monthActivity = data.transactions.filter((item) => item.date.startsWith(selectedMonth)).sort((a, b) => b.date.localeCompare(a.date))
   const visibleActivity = showAllActivity ? monthActivity : monthActivity.slice(0, 4)
   const accountName = (id: string) => data.accounts.find((account) => account.id === id)?.name ?? 'Unknown account'
   const showToast = (message: string) => { setToast(message); window.setTimeout(() => setToast(''), 2600) }
-  const commit = (next: BudgetData, message?: string) => { setData(next); saveBudgetData(next); setRemoteCoach(null); if (message) showToast(message) }
+  const commit = (next: BudgetData, message?: string) => { setData(next); saveBudgetData(next); if (message) showToast(message) }
 
   const saveTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const next = {
@@ -264,15 +255,6 @@ function App() {
     }
     commit(next, 'Transaction saved. Forecast updated.')
     setModal(null)
-  }
-
-  const refreshCoach = async () => {
-    if (!environmentStatus.aiCoaching) { setModal('settings'); return }
-    setCoachLoading(true)
-    setCoachError('')
-    try { setRemoteCoach(await requestAICoaching(forecast, data)) }
-    catch (error) { setCoachError(error instanceof Error ? error.message : 'AI coaching is unavailable.'); setRemoteCoach(null) }
-    finally { setCoachLoading(false) }
   }
 
   const setAppTheme = (nextTheme: 'light' | 'dark') => {
@@ -291,24 +273,6 @@ function App() {
   const totalBudget = Object.values(data.settings.categoryBudgets).reduce((sum, value) => sum + value, 0)
   const usedBudget = Math.max(0, totalBudget - forecast.remainingEssentials)
   const planProgress = totalBudget ? Math.min(100, (usedBudget / totalBudget) * 100) : 0
-  const suggestionItems = [
-    ...(data.lastCheckIn !== todayKey() ? [{
-      id: 'daily-check-in',
-      title: 'Do a one-minute check-in',
-      body: 'Confirm your cash so today\'s safe-to-spend number stays accurate.',
-      action: 'Start check-in',
-      tone: 'watch' as const,
-    }] : []),
-    ...coach.insights,
-  ].slice(0, 3)
-
-  const runSuggestionAction = (id: string) => {
-    if (id === 'daily-check-in') setModal('checkin')
-    else if (id === 'safe-to-spend') setModal('affordability')
-    else if (id === 'spending-pace') document.querySelector('#activity')?.scrollIntoView({ behavior: 'smooth' })
-    else setModal('assumptions')
-  }
-
   return (
     <div className="app-shell">
       <header className="app-header">
@@ -345,24 +309,6 @@ function App() {
             </div>
           </article>
 
-          <aside className="suggestions-card" id="insights">
-            <div className="card-heading">
-              <span className="heading-icon"><Sparkles size={19} /></span>
-              <div><h2>What to do next</h2><p>{coach.summary}</p></div>
-              {environmentStatus.aiCoaching && <button className="icon-button compact-button" aria-label="Refresh suggestions" onClick={refreshCoach} disabled={coachLoading}><RefreshCw size={16} className={coachLoading ? 'spinning' : ''} /></button>}
-            </div>
-            {coachError && <div className="inline-error"><AlertCircle size={16} />Connected suggestions are unavailable. Local suggestions are still shown.</div>}
-            <div className="suggestion-list">
-              {suggestionItems.map((item) => (
-                <button className={`suggestion ${item.tone}`} key={item.id} onClick={() => runSuggestionAction(item.id)}>
-                  <i />
-                  <span><strong>{item.title}</strong><small>{item.body}</small></span>
-                  <span className="suggestion-action">{item.action}<ChevronRight size={15} /></span>
-                </button>
-              ))}
-            </div>
-            <div className="suggestion-source">{coach.source === 'remote' ? <><Cloud size={13} />Connected suggestions</> : <><Database size={13} />Calculated on this device</>}</div>
-          </aside>
         </section>
 
         <section className="quick-actions" aria-label="Quick actions">
