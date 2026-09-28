@@ -12,9 +12,7 @@ import {
   CreditCard,
   Database,
   ListChecks,
-  LockKeyhole,
   Moon,
-  PiggyBank,
   Plus,
   Settings,
   ShieldCheck,
@@ -260,7 +258,7 @@ function App() {
   const setAppTheme = (nextTheme: 'light' | 'dark') => {
     setTheme(nextTheme)
     document.documentElement.dataset.theme = nextTheme
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#07101c' : '#f3f7fc')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', nextTheme === 'dark' ? '#000000' : '#f5f5f7')
     localStorage.setItem('budget-tracker-theme', nextTheme)
   }
 
@@ -275,22 +273,17 @@ function App() {
   const planProgress = totalBudget ? Math.min(100, (usedBudget / totalBudget) * 100) : 0
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <div className="brand"><span className="brand-mark"><PiggyBank size={20} /></span><span>Budget</span></div>
-        <div className="header-actions">
-          <span className="secure-status"><LockKeyhole size={15} />Saved on this device</span>
-          <button className="icon-button" onClick={() => setModal('settings')} aria-label="Open settings"><Settings size={19} /></button>
-          <button className="primary" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={18} />{data.accounts.length ? 'Add transaction' : 'Add account'}</button>
-        </div>
-      </header>
-
       <main className="dashboard">
         <div className="page-heading">
-          <div><p className="date">{fullDate.format(new Date())}</p><h1>Your budget</h1></div>
-          <label className="month-control"><span className="sr-only">Forecast month</span><input type="month" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /><CalendarDays size={17} /></label>
+          <div className="page-intro"><p className="date">{fullDate.format(new Date())}</p><h1>Your money,<br />clearly.</h1><p className="page-description">A simple view of what you can spend, what is protected, and what comes next.</p></div>
+          <div className="page-tools">
+            <label className="month-control"><span className="sr-only">Forecast month</span><input type="month" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /><CalendarDays size={18} /></label>
+            <button className="icon-button" onClick={() => setModal('settings')} aria-label="Open settings"><Settings size={21} /></button>
+            <button className="primary" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={19} />{data.accounts.length ? 'Add transaction' : 'Add account'}</button>
+          </div>
         </div>
 
-        <section className="overview-grid" id="overview">
+        <section className="bento-grid" id="overview">
           <article className="safe-card">
             <div className="safe-card-head">
               <span><ShieldCheck size={18} />Safe to spend</span>
@@ -308,12 +301,10 @@ function App() {
             </div>
           </article>
 
-        </section>
-
         <section className="quick-actions" aria-label="Quick actions">
-          <button className="action-card" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={20} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong></span><ChevronRight size={18} /></button>
-          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={20} /></span><span><strong>Daily check-in</strong></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={19} /> : <ChevronRight size={18} />}</button>
-          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={20} /></span><span><strong>Check a purchase</strong></span><ChevronRight size={18} /></button>
+          <button className="action-card action-primary" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={23} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong><small>Keep your forecast current</small></span><ChevronRight size={21} /></button>
+          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={23} /></span><span><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'Completed for today' : 'Takes about a minute'}</small></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={21} /> : <ChevronRight size={21} />}</button>
+          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={23} /></span><span><strong>Check a purchase</strong><small>Find a safe date to buy</small></span><ChevronRight size={21} /></button>
         </section>
 
         <section className="detail-grid">
@@ -332,8 +323,8 @@ function App() {
 
         <section className="content-card plan-card">
           <div className="section-heading">
-            <div><h2>Monthly plan</h2><p>{money.format(forecast.remainingEssentials)} reserved</p></div>
-            <button className="confidence-button" onClick={() => setModal('assumptions')}><BarChart3 size={16} />Forecast</button>
+            <div><h2>Monthly plan</h2><p>{money.format(forecast.remainingEssentials)} reserved for essentials</p></div>
+            <button className="confidence-button" onClick={() => setModal('assumptions')}><BarChart3 size={17} />View forecast</button>
           </div>
           <div className="plan-summary"><div className="plan-track"><span style={{ width: `${planProgress}%` }} /></div><span>{Math.round(planProgress)}% used</span></div>
           <div className="essential-list">{essentials.map(({ label, icon: Icon }) => {
@@ -341,6 +332,7 @@ function App() {
             const budget = data.settings.categoryBudgets[label] ?? 0
             return <div className="essential" key={label}><span className="essential-icon"><Icon size={18} /></span><div className="essential-main"><div><strong>{label}</strong><span>{money.format(spent)} / {money.format(budget)}</span></div><div className="progress"><span style={{ width: `${Math.min(100, budget ? (spent / budget) * 100 : 0)}%` }} /></div></div></div>
           })}</div>
+        </section>
         </section>
       </main>
 
