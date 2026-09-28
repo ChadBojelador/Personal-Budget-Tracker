@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseBrowserClient } from './utils/supabase/client'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim() ?? ''
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim() ?? ''
@@ -16,12 +16,10 @@ export const environmentStatus = {
   aiCoaching: Boolean(appConfig.aiCoachingUrl),
 }
 
-let supabase: SupabaseClient | null = null
+let supabase: SupabaseBrowserClient | null = null
 
 export function getSupabaseClient() {
   if (!environmentStatus.supabase) return null
-  supabase ??= createClient(supabaseUrl, supabaseKey, {
-    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
-  })
+  supabase ??= createClient()
   return supabase
 }
