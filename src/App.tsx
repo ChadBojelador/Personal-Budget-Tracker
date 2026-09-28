@@ -320,22 +320,22 @@ function App() {
           <article className="content-card accounts-card">
             <div className="section-heading"><div><h2>Accounts</h2><p>{money.format(forecast.currentBalance)} total</p></div><button className="text-button" onClick={() => setModal('accounts')}>Manage <ChevronRight size={16} /></button></div>
             <div className="account-list">{data.accounts.length ? data.accounts.map((account) => <div className="account-item" key={account.id}><span className={`account-symbol ${account.type}`}><WalletCards size={18} /></span><span><strong>{account.name}</strong><small>Updated {new Date(account.updatedAt).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })}</small></span><strong>{money.format(account.balance)}</strong></div>) : <div className="empty-state"><WalletCards size={22} /><strong>No accounts yet</strong></div>}</div>
-            <button className="secondary wide" onClick={() => setModal('accounts')}><Plus size={16} />Add or update accounts</button>
+            <button className="secondary wide" onClick={() => setModal('accounts')}><Plus size={16} />Manage accounts</button>
           </article>
 
           <article className="content-card activity-card" id="activity">
             <div className="section-heading"><div><h2>Recent activity</h2><p>{monthLabel(selectedMonth)}</p></div>{monthActivity.length > 4 && <button className="text-button" onClick={() => setShowAllActivity((value) => !value)}>{showAllActivity ? 'Show less' : 'See all'} <ChevronRight size={16} /></button>}</div>
             <div className="activity-list">{visibleActivity.length ? visibleActivity.map((item) => <div className="activity-row" key={item.id}><span className={`activity-icon ${item.kind}`}>{item.kind === 'income' ? <ArrowDownLeft size={18} /> : <CircleDollarSign size={18} />}</span><span className="activity-copy"><strong>{item.description}</strong><small>{item.category} · {accountName(item.accountId)}</small></span><strong className={item.kind === 'income' ? 'positive' : ''}>{item.kind === 'income' ? '+' : '−'}{money.format(item.amount)}</strong></div>) : <div className="empty-state"><CircleDollarSign size={22} /><strong>No activity yet</strong></div>}</div>
-            <button className="secondary wide" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={16} />{data.accounts.length ? 'Add transaction' : 'Add an account first'}</button>
+            <button className="secondary wide" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={16} />{data.accounts.length ? 'Add transaction' : 'Add account'}</button>
           </article>
         </section>
 
         <section className="content-card plan-card">
           <div className="section-heading">
-            <div><h2>Your monthly plan</h2><p>{money.format(forecast.remainingEssentials)} still reserved for essentials.</p></div>
-            <button className="confidence-button" onClick={() => setModal('assumptions')}><BarChart3 size={16} />See forecast details</button>
+            <div><h2>Monthly plan</h2><p>{money.format(forecast.remainingEssentials)} reserved</p></div>
+            <button className="confidence-button" onClick={() => setModal('assumptions')}><BarChart3 size={16} />Forecast</button>
           </div>
-          <div className="plan-summary"><div className="plan-track"><span style={{ width: `${planProgress}%` }} /></div><span>{Math.round(planProgress)}% of essential budgets used</span></div>
+          <div className="plan-summary"><div className="plan-track"><span style={{ width: `${planProgress}%` }} /></div><span>{Math.round(planProgress)}% used</span></div>
           <div className="essential-list">{essentials.map(({ label, icon: Icon }) => {
             const spent = forecast.spendByCategory[label] ?? 0
             const budget = data.settings.categoryBudgets[label] ?? 0
