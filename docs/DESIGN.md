@@ -2,10 +2,10 @@
 
 ## Concept
 
-The interface is a calm, private window onto the month. Its signature element
-is a continuous spending runway that connects today's available money, the next
-allowance checkpoint, protected expenses, and projected month end. Glass is
-used to establish depth and focus, not as decoration on every box.
+The interface is a calm daily budget check-in. Its signature element is one
+plain-language safe-to-spend card that answers the user's first question before
+showing any supporting detail. A contextual suggestion card sits beside it and
+turns the forecast into a small set of useful next steps.
 
 ## Tokens
 
@@ -38,33 +38,39 @@ marketing typography.
 ## Layout
 
 ```text
-+ sidebar --+------------------------------------------------+
-| Month     |  greeting                         vault status |
-| Activity  |                                                |
-| Wishlist  |  [ continuous spending runway and forecast ]  |
-| Insights  |                                                |
-| Settings  |  account strip                                |
-|           |                                                |
-| check-in  |  protected essentials   next useful actions   |
-+-----------+------------------------------------------------+
++-------------------------------------------------------------+
+| Budget                              settings   add transaction|
++-------------------------------------------------------------+
+| heading                                      month           |
+|                                                             |
+| [ safe to spend / key numbers ] [ what to do next ]         |
+|                                                             |
+| [ add transaction ] [ daily check-in ] [ check a purchase ] |
+|                                                             |
+| [ accounts ]             [ recent activity ]                |
+| [ monthly plan                                        ]     |
++-------------------------------------------------------------+
 ```
 
-The layout is left-aligned and spacious. The runway receives the visual energy;
-supporting modules are quieter and not forced into identical cards.
+The layout is left-aligned and spacious. The safe-to-spend card receives the
+visual energy. Action cards use consistent placement because they are peers;
+supporting account, activity, and budget cards are quieter and list-based.
 
-## Glass rules
+## Card rules
 
-- Use translucent surfaces only where layering communicates context.
-- Maintain an opaque-enough fallback for contrast and reduced transparency.
-- Use subtle inner highlights and a cool shadow; avoid neon gradients.
-- Vary radius by hierarchy: large forecast plane, medium controls, compact
-  status chips.
-- Motion is reserved for revealing a changed forecast or confirming a logged
-  transaction and is disabled under reduced-motion preferences.
+- Use one dark blue card for the primary financial answer.
+- Use light borders and little or no shadow for supporting cards.
+- Vary radius and corner treatment by hierarchy instead of applying one tile
+  style everywhere.
+- Keep suggestions to three and pair each one with a direct action.
+- Preserve an opaque fallback for reduced transparency and disable motion when
+  the user requests reduced motion.
 
 ## Review against the brief
 
-The initial direction risked becoming a generic collection of frosted cards.
-It was revised around the spending runway: a financial timeline specific to
-twice-monthly allowance, protected essentials, and a month-end destination.
-Glass now supports that layered timeline instead of defining every component.
+The earlier dashboard exposed the full model at once: a timeline, coaching,
+accounts, essentials, activity, and wishlist all competed for attention. The
+revision removes the sidebar and timeline from the primary workflow, leads with
+safe-to-spend, and uses contextual suggestions plus three obvious actions.
+Cards remain because the brief requested them, but hierarchy, corner treatment,
+and content density vary so the result does not read as an identical tile grid.

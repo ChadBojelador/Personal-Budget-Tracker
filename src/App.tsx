@@ -3,7 +3,6 @@ import {
   ArrowDownLeft,
   ArrowRight,
   BarChart3,
-  Bell,
   Bot,
   CalendarDays,
   Check,
@@ -13,10 +12,8 @@ import {
   Cloud,
   CreditCard,
   Database,
-  LayoutDashboard,
   ListChecks,
   LockKeyhole,
-  Menu,
   Moon,
   PiggyBank,
   Plus,
@@ -240,8 +237,6 @@ function App() {
   const [data, setData] = useState(() => loadBudgetData(appConfig.demoMode))
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey())
   const [modal, setModal] = useState<Modal>(null)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [showAllActivity, setShowAllActivity] = useState(false)
   const [remoteCoach, setRemoteCoach] = useState<CoachResponse | null>(null)
   const [coachLoading, setCoachLoading] = useState(false)
@@ -294,96 +289,113 @@ function App() {
     { label: 'Mobile load', icon: CreditCard },
   ]
   const totalBudget = Object.values(data.settings.categoryBudgets).reduce((sum, value) => sum + value, 0)
-  const runwayProgress = Math.min(100, Math.max(4, (forecast.daysElapsed / Math.max(1, forecast.daysElapsed + forecast.daysRemaining)) * 100))
-  const todayMarker = Math.min(78, Math.max(18, runwayProgress))
+  const usedBudget = Math.max(0, totalBudget - forecast.remainingEssentials)
+  const planProgress = totalBudget ? Math.min(100, (usedBudget / totalBudget) * 100) : 0
+  const suggestionItems = [
+    ...(data.lastCheckIn !== todayKey() ? [{
+      id: 'daily-check-in',
+      title: 'Do a one-minute check-in',
+      body: 'Confirm your cash so today\'s safe-to-spend number stays accurate.',
+      action: 'Start check-in',
+      tone: 'watch' as const,
+    }] : []),
+    ...coach.insights,
+  ].slice(0, 3)
+
+  const runSuggestionAction = (id: string) => {
+    if (id === 'daily-check-in') setModal('checkin')
+    else if (id === 'safe-to-spend') setModal('affordability')
+    else if (id === 'spending-pace') document.querySelector('#activity')?.scrollIntoView({ behavior: 'smooth' })
+    else setModal('assumptions')
+  }
 
   return (
     <div className="app-shell">
-      <div className="ambient ambient-one" /><div className="ambient ambient-two" />
-      <aside className={menuOpen ? 'sidebar open' : 'sidebar'}>
+      <header className="app-header">
         <div className="brand"><span className="brand-mark"><PiggyBank size={20} /></span><span>Budget</span></div>
-        <nav aria-label="Primary navigation">
-          <a className="nav-item active" href="#overview" onClick={() => setMenuOpen(false)}><LayoutDashboard size={19} />Overview</a>
-          <a className="nav-item" href="#activity" onClick={() => setMenuOpen(false)}><CircleDollarSign size={19} />Activity</a>
-          <a className="nav-item" href="#wishlist" onClick={() => setMenuOpen(false)}><ShoppingBag size={19} />Wishlist</a>
-          <a className="nav-item" href="#insights" onClick={() => setMenuOpen(false)}><Sparkles size={19} />Insights</a>
-        </nav>
-        <div className="sidebar-bottom">
-          <button className="check-in-button" onClick={() => setModal('checkin')}><span><ListChecks size={19} /></span><span><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'Complete for today' : 'Due at 9:00 PM'}</small></span></button>
-          <button className="nav-item nav-button" onClick={() => setModal('settings')}><Settings size={19} />Settings</button>
-          <button className="profile profile-button" onClick={() => setModal('settings')}><span className="avatar">C</span><span><strong>My budget</strong><small>Local vault unlocked</small></span><ChevronRight size={17} /></button>
+        <div className="header-actions">
+          <span className="secure-status"><LockKeyhole size={15} />Saved on this device</span>
+          <button className="icon-button" onClick={() => setModal('settings')} aria-label="Open settings"><Settings size={19} /></button>
+          <button className="primary" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={18} />{data.accounts.length ? 'Add transaction' : 'Add account'}</button>
         </div>
-      </aside>
-      {menuOpen && <button className="sidebar-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
-      <button className="mobile-menu icon-button" onClick={() => setMenuOpen((value) => !value)} aria-label="Toggle navigation"><Menu size={20} /></button>
+      </header>
 
-      <main>
-        <header className="topbar">
-          <div><p className="date">{fullDate.format(new Date())}</p><h1>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}.</h1></div>
-          <div className="top-actions">
-            <span className="secure-status"><LockKeyhole size={15} />Private local vault</span>
-            <div className="notification-wrap">
-              <button className="icon-button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen((value) => !value)}><Bell size={19} /><i /></button>
-              {notificationsOpen && <div className="notification-panel"><div><strong>Forecast updated</strong><small>Your spending pace is reflected in the new month-end estimate.</small></div><div><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'You are all caught up.' : 'Cash confirmation is still due today.'}</small></div><button className="text-button" onClick={() => { setNotificationsOpen(false); setModal('checkin') }}>Open check-in</button></div>}
+      <main className="dashboard">
+        <div className="page-heading">
+          <div><p className="date">{fullDate.format(new Date())}</p><h1>Your budget, at a glance.</h1><p className="page-intro">Start with what is safe to spend, then choose one next step.</p></div>
+          <label className="month-control"><span className="sr-only">Forecast month</span><input type="month" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /><CalendarDays size={17} /></label>
+        </div>
+
+        <section className="overview-grid" id="overview">
+          <article className="safe-card">
+            <div className="safe-card-head">
+              <span><ShieldCheck size={18} />Safe to spend</span>
+              <button onClick={() => setModal('assumptions')}>{Math.round(forecast.confidenceScore * 100)}% confidence <ChevronRight size={14} /></button>
             </div>
-            <button className="primary" onClick={() => setModal('transaction')}><Plus size={18} />Add transaction</button>
-          </div>
-        </header>
+            <strong className="safe-amount">{money.format(forecast.safeToSpend)}</strong>
+            <p>{forecast.safeToSpend > 0 ? 'Available for flexible spending without touching your essentials or savings goal.' : 'Pause flexible spending for now. Your protected money already uses the available balance.'}</p>
+            <div className="safe-stats">
+              <div><span>Total balance</span><strong>{money.format(forecast.currentBalance)}</strong></div>
+              <div><span>Needs left</span><strong>{money.format(forecast.remainingEssentials)}</strong></div>
+              <div><span>Month-end savings</span><strong>{money.format(forecast.projectedSavings)}</strong></div>
+            </div>
+            <div className="safe-actions">
+              <button className="primary light" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={17} />{data.accounts.length ? 'Log spending' : 'Add an account'}</button>
+              <button className="ghost-light" onClick={() => setModal('affordability')}>Check a purchase</button>
+            </div>
+          </article>
 
-        <section className="runway" id="overview">
-          <div className="runway-head">
-            <div><p>Your month at a glance</p><div className="balance-row"><h2>{money.format(forecast.currentBalance)}</h2><span className={forecast.monthIncome - forecast.monthSpending >= 0 ? 'trend' : 'trend negative'}>{forecast.monthIncome - forecast.monthSpending >= 0 ? '+' : '−'}{money.format(Math.abs(forecast.monthIncome - forecast.monthSpending))} this month</span></div><span className="subtle">Across {data.accounts.length} account{data.accounts.length === 1 ? '' : 's'} · forecast updates with every entry</span></div>
-            <label className="month-control"><span className="sr-only">Forecast month</span><input type="month" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /><CalendarDays size={17} /></label>
-          </div>
-          <div className="runway-track" aria-label={`${monthLabel(selectedMonth)} budget timeline`}>
-            <div className="track-line"><span style={{ width: `${runwayProgress}%` }} /></div>
-            <div className="track-point start"><i /><span>Month start<small>{money.format(forecast.currentBalance - forecast.monthIncome + forecast.monthSpending)}</small></span></div>
-            <div className="track-point today" style={{ left: `${todayMarker}%` }}><i /><span>{selectedMonth === currentMonthKey() ? 'Today' : 'Recorded'}<small>{money.format(forecast.currentBalance)} available</small></span></div>
-            <div className="track-point finish"><i /><span>Month end<small>{money.format(forecast.projectedMonthEnd)} projected</small></span></div>
-          </div>
-          <div className="forecast-strip">
-            <div><ShieldCheck size={19} /><span><strong>{money.format(data.settings.emergencyFloor)}</strong><small>Emergency floor protected</small></span></div>
-            <div><PiggyBank size={19} /><span><strong>{money.format(forecast.projectedSavings)}</strong><small>Projected month-end savings</small></span></div>
-            <button className="forecast-detail" onClick={() => setModal('assumptions')}><BarChart3 size={19} /><span><strong>{Math.round(forecast.confidenceScore * 100)}% {forecast.confidence} confidence</strong><small>{forecast.dataDays} activity days · see assumptions</small></span><ChevronRight size={17} /></button>
-          </div>
+          <aside className="suggestions-card" id="insights">
+            <div className="card-heading">
+              <span className="heading-icon"><Sparkles size={19} /></span>
+              <div><h2>What to do next</h2><p>{coach.summary}</p></div>
+              {environmentStatus.aiCoaching && <button className="icon-button compact-button" aria-label="Refresh suggestions" onClick={refreshCoach} disabled={coachLoading}><RefreshCw size={16} className={coachLoading ? 'spinning' : ''} /></button>}
+            </div>
+            {coachError && <div className="inline-error"><AlertCircle size={16} />Connected suggestions are unavailable. Local suggestions are still shown.</div>}
+            <div className="suggestion-list">
+              {suggestionItems.map((item) => (
+                <button className={`suggestion ${item.tone}`} key={item.id} onClick={() => runSuggestionAction(item.id)}>
+                  <i />
+                  <span><strong>{item.title}</strong><small>{item.body}</small></span>
+                  <span className="suggestion-action">{item.action}<ChevronRight size={15} /></span>
+                </button>
+              ))}
+            </div>
+            <div className="suggestion-source">{coach.source === 'remote' ? <><Cloud size={13} />Connected suggestions</> : <><Database size={13} />Calculated on this device</>}</div>
+          </aside>
         </section>
 
-        <section className="coach-panel" id="insights">
-          <div className="coach-intro"><span className="coach-mark"><Bot size={23} /></span><div><h2>Forecast coach</h2><p>{coach.summary}</p></div><span className="source-pill">{coach.source === 'remote' ? <><Cloud size={13} /> Connected AI</> : <><Database size={13} /> On-device</>}</span><button className="icon-button coach-refresh" aria-label="Refresh AI coaching" onClick={refreshCoach} disabled={coachLoading}><RefreshCw size={17} className={coachLoading ? 'spinning' : ''} /></button></div>
-          {coachError && <div className="inline-error"><AlertCircle size={16} />{coachError} Local coaching remains active.</div>}
-          <div className="coach-grid">
-            {coach.insights.map((insight) => <article className={`coach-insight ${insight.tone}`} key={insight.id}><i /><h3>{insight.title}</h3><p>{insight.body}</p><button className="text-button" onClick={() => insight.id === 'safe-to-spend' ? setModal('affordability') : insight.id === 'spending-pace' ? document.querySelector('#activity')?.scrollIntoView() : setModal('assumptions')}>{insight.action}<ChevronRight size={15} /></button></article>)}
-          </div>
+        <section className="quick-actions" aria-label="Quick actions">
+          <button className="action-card" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={20} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong><small>{data.accounts.length ? 'Record money in or out' : 'Start with where you keep money'}</small></span><ChevronRight size={18} /></button>
+          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={20} /></span><span><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'Done for today' : 'Confirm cash in one minute'}</small></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={19} /> : <ChevronRight size={18} />}</button>
+          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={20} /></span><span><strong>Check a purchase</strong><small>{data.wishlist.length ? `${data.wishlist.length} saved item${data.wishlist.length === 1 ? '' : 's'}` : 'Know before you spend'}</small></span><ChevronRight size={18} /></button>
         </section>
 
-        <section className="accounts-section">
-          <div className="section-heading"><div><h2>Your money</h2><p>Balances reflect saved entries and check-ins.</p></div><button className="text-button" onClick={() => setModal('accounts')}>Manage accounts <ChevronRight size={16} /></button></div>
-          <div className="account-row">
-            {data.accounts.map((account) => <article className={`account ${account.type}`} key={account.id}><div className="account-top"><span className="account-symbol"><WalletCards size={18} /></span><small>{new Date(account.updatedAt).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })}</small></div><p>{account.name}</p><strong>{money.format(account.balance)}</strong></article>)}
-            <button className="account add-account" onClick={() => setModal('accounts')}><Plus size={20} /><span>Add account</span></button>
-          </div>
+        <section className="detail-grid">
+          <article className="content-card accounts-card">
+            <div className="section-heading"><div><h2>Accounts</h2><p>{money.format(forecast.currentBalance)} total</p></div><button className="text-button" onClick={() => setModal('accounts')}>Manage <ChevronRight size={16} /></button></div>
+            <div className="account-list">{data.accounts.length ? data.accounts.map((account) => <div className="account-item" key={account.id}><span className={`account-symbol ${account.type}`}><WalletCards size={18} /></span><span><strong>{account.name}</strong><small>Updated {new Date(account.updatedAt).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })}</small></span><strong>{money.format(account.balance)}</strong></div>) : <div className="empty-state"><WalletCards size={22} /><strong>No accounts yet</strong><span>Add cash, an e-wallet, or a bank account.</span></div>}</div>
+            <button className="secondary wide" onClick={() => setModal('accounts')}><Plus size={16} />Add or update accounts</button>
+          </article>
+
+          <article className="content-card activity-card" id="activity">
+            <div className="section-heading"><div><h2>Recent activity</h2><p>{monthLabel(selectedMonth)}</p></div>{monthActivity.length > 4 && <button className="text-button" onClick={() => setShowAllActivity((value) => !value)}>{showAllActivity ? 'Show less' : 'See all'} <ChevronRight size={16} /></button>}</div>
+            <div className="activity-list">{visibleActivity.length ? visibleActivity.map((item) => <div className="activity-row" key={item.id}><span className={`activity-icon ${item.kind}`}>{item.kind === 'income' ? <ArrowDownLeft size={18} /> : <CircleDollarSign size={18} />}</span><span className="activity-copy"><strong>{item.description}</strong><small>{item.category} · {accountName(item.accountId)}</small></span><strong className={item.kind === 'income' ? 'positive' : ''}>{item.kind === 'income' ? '+' : '−'}{money.format(item.amount)}</strong></div>) : <div className="empty-state"><CircleDollarSign size={22} /><strong>No activity yet</strong><span>Add your first transaction to start the month.</span></div>}</div>
+            <button className="secondary wide" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={16} />{data.accounts.length ? 'Add transaction' : 'Add an account first'}</button>
+          </article>
         </section>
 
-        <div className="lower-grid">
-          <section className="essentials">
-            <div className="section-heading compact"><div><h2>Protected essentials</h2><p>{money.format(forecast.remainingEssentials)} still reserved.</p></div><span className={`confidence ${forecast.confidence}`}>{forecast.confidence} confidence</span></div>
-            <div className="essential-list">{essentials.map(({ label, icon: Icon }) => {
-              const spent = forecast.spendByCategory[label] ?? 0
-              const budget = data.settings.categoryBudgets[label] ?? 0
-              return <div className="essential" key={label}><span className="essential-icon"><Icon size={18} /></span><div className="essential-main"><div><strong>{label}</strong><span>{money.format(spent)} of {money.format(budget)}</span></div><div className="progress"><span style={{ width: `${Math.min(100, budget ? (spent / budget) * 100 : 0)}%` }} /></div></div></div>
-            })}</div>
-            <div className="essential-total"><span>Plan coverage</span><strong>{totalBudget ? Math.round(((totalBudget - forecast.remainingEssentials) / totalBudget) * 100) : 0}% used</strong></div>
-          </section>
-
-          <section className="activity" id="activity">
-            <div className="section-heading compact"><div><h2>Recent activity</h2><p>{monthLabel(selectedMonth)}</p></div>{monthActivity.length > 4 && <button className="text-button" onClick={() => setShowAllActivity((value) => !value)}>{showAllActivity ? 'Show less' : 'See all'} <ChevronRight size={16} /></button>}</div>
-            <div className="activity-list">{visibleActivity.length ? visibleActivity.map((item) => <div className="activity-row" key={item.id}><span className="activity-icon">{item.kind === 'income' ? <ArrowDownLeft size={18} /> : <CircleDollarSign size={18} />}</span><span className="activity-copy"><strong>{item.description}</strong><small>{item.category} · {accountName(item.accountId)}</small></span><strong className={item.kind === 'income' ? 'positive' : ''}>{item.kind === 'income' ? '+' : '−'}{money.format(item.amount)}</strong></div>) : <div className="empty-state">No activity in this month yet.</div>}</div>
-            <button className="secondary wide" onClick={() => setModal('transaction')}><Plus size={16} />Add another transaction</button>
-          </section>
-        </div>
-
-        <section className="wishlist-callout" id="wishlist">
-          <span className="wish-icon"><ShoppingBag size={22} /></span><div><h2>Plan wants without borrowing from needs</h2><p>{data.wishlist.length ? `${data.wishlist.length} saved item${data.wishlist.length === 1 ? '' : 's'} · ${money.format(forecast.safeToSpend)} flexible today` : 'Check any purchase against essentials, your emergency floor, and savings target.'}</p></div><button className="secondary" onClick={() => setModal('affordability')}>Check affordability <ArrowRight size={17} /></button>
+        <section className="content-card plan-card">
+          <div className="section-heading">
+            <div><h2>Your monthly plan</h2><p>{money.format(forecast.remainingEssentials)} still reserved for essentials.</p></div>
+            <button className="confidence-button" onClick={() => setModal('assumptions')}><BarChart3 size={16} />See forecast details</button>
+          </div>
+          <div className="plan-summary"><div className="plan-track"><span style={{ width: `${planProgress}%` }} /></div><span>{Math.round(planProgress)}% of essential budgets used</span></div>
+          <div className="essential-list">{essentials.map(({ label, icon: Icon }) => {
+            const spent = forecast.spendByCategory[label] ?? 0
+            const budget = data.settings.categoryBudgets[label] ?? 0
+            return <div className="essential" key={label}><span className="essential-icon"><Icon size={18} /></span><div className="essential-main"><div><strong>{label}</strong><span>{money.format(spent)} / {money.format(budget)}</span></div><div className="progress"><span style={{ width: `${Math.min(100, budget ? (spent / budget) * 100 : 0)}%` }} /></div></div></div>
+          })}</div>
         </section>
       </main>
 
