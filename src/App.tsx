@@ -298,9 +298,9 @@ function App() {
             </div>
             <strong className="safe-amount">{money.format(forecast.safeToSpend)}</strong>
             <div className="safe-stats">
-              <div><span>Total balance</span><strong>{money.format(forecast.currentBalance)}</strong></div>
-              <div><span>Needs left</span><strong>{money.format(forecast.remainingEssentials)}</strong></div>
-              <div><span>Month-end savings</span><strong>{money.format(forecast.projectedSavings)}</strong></div>
+              <div><span>Balance</span><strong>{money.format(forecast.currentBalance)}</strong></div>
+              <div><span>Essentials</span><strong>{money.format(forecast.remainingEssentials)}</strong></div>
+              <div><span>Savings</span><strong>{money.format(forecast.projectedSavings)}</strong></div>
             </div>
             <div className="safe-actions">
               <button className="primary light" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><Plus size={17} />{data.accounts.length ? 'Log spending' : 'Add an account'}</button>
