@@ -311,9 +311,9 @@ function App() {
         </section>
 
         <section className="quick-actions" aria-label="Quick actions">
-          <button className="action-card" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={20} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong><small>{data.accounts.length ? 'Record money in or out' : 'Start with where you keep money'}</small></span><ChevronRight size={18} /></button>
-          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={20} /></span><span><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'Done for today' : 'Confirm cash in one minute'}</small></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={19} /> : <ChevronRight size={18} />}</button>
-          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={20} /></span><span><strong>Check a purchase</strong><small>{data.wishlist.length ? `${data.wishlist.length} saved item${data.wishlist.length === 1 ? '' : 's'}` : 'Know before you spend'}</small></span><ChevronRight size={18} /></button>
+          <button className="action-card" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={20} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong></span><ChevronRight size={18} /></button>
+          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={20} /></span><span><strong>Daily check-in</strong></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={19} /> : <ChevronRight size={18} />}</button>
+          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={20} /></span><span><strong>Check a purchase</strong></span><ChevronRight size={18} /></button>
         </section>
 
         <section className="detail-grid">
