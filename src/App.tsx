@@ -34,7 +34,7 @@ import {
 } from 'lucide-react'
 import { type FormEvent, type ReactNode, useMemo, useState } from 'react'
 import { requestAICoaching } from './aiCoach'
-import { environmentStatus } from './config'
+import { appConfig, environmentStatus } from './config'
 import { loadBudgetData, resetBudgetData, saveBudgetData } from './data'
 import { calculateForecast, checkAffordability, createLocalCoaching, currentMonthKey } from './forecast'
 import type { Account, BudgetData, BudgetSettings, CoachResponse, Transaction, WishlistItem } from './types'
@@ -204,9 +204,10 @@ function AffordabilityDialog({ data, forecast, onSave, onClose }: {
   )
 }
 
-function SettingsDialog({ settings, theme, onSave, onTheme, onReset, onClose }: {
+function SettingsDialog({ settings, theme, resetLabel, onSave, onTheme, onReset, onClose }: {
   settings: BudgetSettings
   theme: 'light' | 'dark'
+  resetLabel: string
   onSave: (settings: BudgetSettings) => void
   onTheme: (theme: 'light' | 'dark') => void
   onReset: () => void
@@ -230,13 +231,13 @@ function SettingsDialog({ settings, theme, onSave, onTheme, onReset, onClose }: 
         }} /></label>
       </div>
       <div className="theme-row"><span><strong>Appearance</strong><small>Switch without losing your data.</small></span><div className="segmented"><button className={theme === 'light' ? 'active' : ''} onClick={() => onTheme('light')}><Sun size={15} />Light</button><button className={theme === 'dark' ? 'active' : ''} onClick={() => onTheme('dark')}><Moon size={15} />Dark</button></div></div>
-      <div className="dialog-actions"><button className="text-button danger-text" onClick={onReset}>Reset demo data</button><button className="primary" onClick={save}>Save settings</button></div>
+      <div className="dialog-actions"><button className="text-button danger-text" onClick={onReset}>{resetLabel}</button><button className="primary" onClick={save}>Save settings</button></div>
     </Dialog>
   )
 }
 
 function App() {
-  const [data, setData] = useState(loadBudgetData)
+  const [data, setData] = useState(() => loadBudgetData(appConfig.demoMode))
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey())
   const [modal, setModal] = useState<Modal>(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -390,7 +391,7 @@ function App() {
       {modal === 'accounts' && <AccountsDialog accounts={data.accounts} onAdd={(account) => commit({ ...data, accounts: [...data.accounts, { ...account, id: uid(), updatedAt: new Date().toISOString() }] }, 'Account added.')} onUpdate={(id, balance) => commit({ ...data, accounts: data.accounts.map((account) => account.id === id ? { ...account, balance: Math.max(0, balance), updatedAt: new Date().toISOString() } : account) })} onDelete={(id) => commit({ ...data, accounts: data.accounts.filter((account) => account.id !== id), transactions: data.transactions.filter((item) => item.accountId !== id) }, 'Account removed.')} onClose={() => setModal(null)} />}
       {modal === 'checkin' && <CheckInDialog data={data} onComplete={(cashBalance) => { commit({ ...data, lastCheckIn: todayKey(), accounts: data.accounts.map((account) => account.type === 'cash' ? { ...account, balance: cashBalance, updatedAt: new Date().toISOString() } : account) }, 'Check-in complete. Forecast refreshed.'); setModal(null) }} onClose={() => setModal(null)} />}
       {modal === 'affordability' && <AffordabilityDialog data={data} forecast={forecast} onSave={(item) => { commit({ ...data, wishlist: [...data.wishlist, { ...item, id: uid() }] }, 'Saved to your wishlist.'); setModal(null) }} onClose={() => setModal(null)} />}
-      {modal === 'settings' && <SettingsDialog settings={data.settings} theme={theme} onSave={(settings) => commit({ ...data, settings }, 'Settings saved. Forecast recalculated.')} onTheme={setAppTheme} onReset={() => { commit(resetBudgetData(), 'Demo data restored.'); setModal(null) }} onClose={() => setModal(null)} />}
+      {modal === 'settings' && <SettingsDialog settings={data.settings} theme={theme} resetLabel={appConfig.demoMode ? 'Reset demo data' : 'Clear all data'} onSave={(settings) => commit({ ...data, settings }, 'Settings saved. Forecast recalculated.')} onTheme={setAppTheme} onReset={() => { commit(resetBudgetData(appConfig.demoMode), appConfig.demoMode ? 'Demo data restored.' : 'Local data cleared.'); setModal(null) }} onClose={() => setModal(null)} />}
       {modal === 'assumptions' && <Dialog title="Forecast assumptions" description="Every prediction stays traceable to data you can review." onClose={() => setModal(null)}><div className="assumption-list"><div><span>Current funds</span><strong>{money.format(forecast.currentBalance)}</strong></div><div><span>Expected allowance</span><strong>+{money.format(forecast.expectedIncome)}</strong></div><div><span>Remaining essentials</span><strong>−{money.format(forecast.remainingEssentials)}</strong></div><div><span>Uncertainty hold</span><strong>−{money.format(forecast.uncertaintyHold)}</strong></div><div className="assumption-total"><span>Projected month end</span><strong>{money.format(forecast.projectedMonthEnd)}</strong></div></div><ul className="reason-list">{forecast.confidenceReasons.map((reason) => <li key={reason}><CheckCircle2 size={15} />{reason}</li>)}</ul></Dialog>}
       {toast && <div className="toast" role="status"><CheckCircle2 size={17} />{toast}</div>}
     </div>

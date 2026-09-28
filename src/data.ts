@@ -10,6 +10,21 @@ const isoDaysAgo = (days: number, now = new Date()) => {
 
 const dateDaysAgo = (days: number, now = new Date()) => isoDaysAgo(days, now).slice(0, 10)
 
+export function createEmptyData(): BudgetData {
+  return {
+    accounts: [],
+    transactions: [],
+    wishlist: [],
+    settings: {
+      emergencyFloor: 0,
+      savingsTarget: 0,
+      allowanceAmount: 0,
+      allowanceDays: [1, 15],
+      categoryBudgets: { Food: 0, Transport: 0, 'Wi-Fi': 0, 'Mobile load': 0 },
+    },
+  }
+}
+
 export function createDemoData(now = new Date()): BudgetData {
   return {
     accounts: [
@@ -51,14 +66,18 @@ function isBudgetData(value: unknown): value is BudgetData {
     && Boolean(candidate.settings)
 }
 
-export function loadBudgetData(): BudgetData {
+export function createInitialBudgetData(demoMode = false): BudgetData {
+  return demoMode ? createDemoData() : createEmptyData()
+}
+
+export function loadBudgetData(demoMode = false): BudgetData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return createDemoData()
+    if (!raw) return createInitialBudgetData(demoMode)
     const parsed: unknown = JSON.parse(raw)
-    return isBudgetData(parsed) ? parsed : createDemoData()
+    return isBudgetData(parsed) ? parsed : createInitialBudgetData(demoMode)
   } catch {
-    return createDemoData()
+    return createInitialBudgetData(demoMode)
   }
 }
 
@@ -66,8 +85,8 @@ export function saveBudgetData(data: BudgetData) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
-export function resetBudgetData() {
-  const data = createDemoData()
+export function resetBudgetData(demoMode = false) {
+  const data = createInitialBudgetData(demoMode)
   saveBudgetData(data)
   return data
 }

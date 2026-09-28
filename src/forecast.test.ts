@@ -1,10 +1,27 @@
 import { describe, expect, it } from 'vitest'
-import { createDemoData } from './data'
+import { createDemoData, createInitialBudgetData } from './data'
 import { calculateForecast, checkAffordability, createLocalCoaching } from './forecast'
 
 const now = new Date('2026-09-28T12:00:00+08:00')
 
 describe('forecast safety rules', () => {
+  it('starts production mode without seeded financial data', () => {
+    const data = createInitialBudgetData(false)
+
+    expect(data.accounts).toEqual([])
+    expect(data.transactions).toEqual([])
+    expect(data.wishlist).toEqual([])
+    expect(data.settings.emergencyFloor).toBe(0)
+    expect(data.settings.savingsTarget).toBe(0)
+  })
+
+  it('only seeds sample records when demo mode is explicitly enabled', () => {
+    const data = createInitialBudgetData(true)
+
+    expect(data.accounts).toHaveLength(3)
+    expect(data.transactions).toHaveLength(12)
+  })
+
   it('protects essentials, emergency funds, savings, and uncertainty', () => {
     const data = createDemoData(now)
     const forecast = calculateForecast(data, '2026-09', now)

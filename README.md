@@ -35,7 +35,7 @@ deterministic on-device coach.
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 VITE_AI_COACHING_URL=https://your-private-api.example.com/coach
-VITE_DEMO_MODE=true
+VITE_DEMO_MODE=false
 ```
 
 Only a Supabase publishable/anonymous key belongs in the browser. Never put a
@@ -43,6 +43,10 @@ service-role key or an AI provider secret in a `VITE_` variable. The coaching
 URL should point to a server or Supabase Edge Function that keeps its provider
 credentials server-side. See [`docs/AI_COACHING.md`](docs/AI_COACHING.md) for
 the request and response contract.
+
+Production starts with an empty budget when `VITE_DEMO_MODE` is omitted or set
+to `false`. Set it to `true` only for preview deployments that should include
+sample accounts and transactions.
 
 ## Verification
 

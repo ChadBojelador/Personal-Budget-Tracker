@@ -7,7 +7,7 @@ export const appConfig = {
   supabaseUrl,
   supabaseKey,
   aiCoachingUrl: import.meta.env.VITE_AI_COACHING_URL?.trim() ?? '',
-  demoMode: (import.meta.env.VITE_DEMO_MODE?.trim() ?? 'true') !== 'false',
+  demoMode: import.meta.env.VITE_DEMO_MODE?.trim().toLowerCase() === 'true',
 }
 
 export const environmentStatus = {
