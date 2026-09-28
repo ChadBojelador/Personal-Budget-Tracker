@@ -632,8 +632,7 @@ body { background: var(--canvas); }
   align-items: stretch;
 }
 
-.bento-grid > .safe-card { grid-column: span 8; }
-.bento-grid > .quick-actions { grid-column: span 4; }
+.bento-grid > .safe-card { grid-column: 1 / -1; }
 .bento-grid > .detail-grid { display: contents; }
 .bento-grid .accounts-card { grid-column: span 4; }
 .bento-grid .activity-card { grid-column: span 8; }
@@ -751,7 +750,6 @@ input, select { min-height: 48px; padding: 0 15px; border-radius: 13px; font-siz
   .page-heading { align-items: flex-start; flex-direction: column; gap: 28px; }
   .page-tools { justify-content: flex-start; }
   .bento-grid > .safe-card { grid-column: 1 / -1; }
-  .bento-grid > .quick-actions { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; }
   .bento-grid .accounts-card { grid-column: span 5; order: initial; }
   .bento-grid .activity-card { grid-column: span 7; order: initial; }
   .action-card { grid-template-columns: 48px 1fr auto; padding: 20px; }
@@ -766,7 +764,6 @@ input, select { min-height: 48px; padding: 0 15px; border-radius: 13px; font-siz
   .page-tools { width: 100%; flex-wrap: wrap; }
   .page-tools .primary { flex: 1; }
   .bento-grid { gap: 14px; }
-  .bento-grid > .quick-actions { grid-template-columns: 1fr; gap: 14px; }
   .bento-grid .accounts-card, .bento-grid .activity-card { grid-column: 1 / -1; }
   .action-card { min-height: 104px; }
   .safe-card { min-height: 440px; padding: 28px; border-radius: 30px; }

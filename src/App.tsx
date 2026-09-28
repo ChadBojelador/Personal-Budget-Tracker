@@ -16,7 +16,6 @@ import {
   Plus,
   Settings,
   ShieldCheck,
-  ShoppingBag,
   Sun,
   Trash2,
   Utensils,
@@ -300,12 +299,6 @@ function App() {
               <button className="ghost-light" onClick={() => setModal('affordability')}>Check a purchase</button>
             </div>
           </article>
-
-        <section className="quick-actions" aria-label="Quick actions">
-          <button className="action-card action-primary" onClick={() => setModal(data.accounts.length ? 'transaction' : 'accounts')}><span className="action-icon blue"><CircleDollarSign size={23} /></span><span><strong>{data.accounts.length ? 'Add transaction' : 'Add first account'}</strong><small>Keep your forecast current</small></span><ChevronRight size={21} /></button>
-          <button className="action-card" onClick={() => setModal('checkin')}><span className="action-icon green"><ListChecks size={23} /></span><span><strong>Daily check-in</strong><small>{data.lastCheckIn === todayKey() ? 'Completed for today' : 'Takes about a minute'}</small></span>{data.lastCheckIn === todayKey() ? <CheckCircle2 className="done-icon" size={21} /> : <ChevronRight size={21} />}</button>
-          <button className="action-card" onClick={() => setModal('affordability')}><span className="action-icon amber"><ShoppingBag size={23} /></span><span><strong>Check a purchase</strong><small>Find a safe date to buy</small></span><ChevronRight size={21} /></button>
-        </section>
 
         <section className="detail-grid">
           <article className="content-card accounts-card">
