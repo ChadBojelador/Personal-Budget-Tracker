@@ -286,7 +286,7 @@ function App() {
 
       <main className="dashboard">
         <div className="page-heading">
-          <div><p className="date">{fullDate.format(new Date())}</p><h1>Your budget, at a glance.</h1><p className="page-intro">Start with what is safe to spend, then choose one next step.</p></div>
+          <div><p className="date">{fullDate.format(new Date())}</p><h1>Your budget</h1></div>
           <label className="month-control"><span className="sr-only">Forecast month</span><input type="month" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /><CalendarDays size={17} /></label>
         </div>
 
