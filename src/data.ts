@@ -1,6 +1,9 @@
 import type { BudgetData } from './types'
 
 const STORAGE_KEY = 'budget-tracker-data-v1'
+const LEGACY_OWNER_KEY = 'budget-tracker-data-v1-claimed-by'
+
+const storageKey = (userId?: string) => userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY
 
 const isoDaysAgo = (days: number, now = new Date()) => {
   const date = new Date(now)
@@ -70,9 +73,21 @@ export function createInitialBudgetData(demoMode = false): BudgetData {
   return demoMode ? createDemoData() : createEmptyData()
 }
 
-export function loadBudgetData(demoMode = false): BudgetData {
+export function loadBudgetData(demoMode = false, userId?: string): BudgetData {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const scopedKey = storageKey(userId)
+    let raw = localStorage.getItem(scopedKey)
+
+    if (!raw && userId) {
+      const legacyData = localStorage.getItem(STORAGE_KEY)
+      const legacyOwner = localStorage.getItem(LEGACY_OWNER_KEY)
+      if (legacyData && (!legacyOwner || legacyOwner === userId)) {
+        localStorage.setItem(scopedKey, legacyData)
+        localStorage.setItem(LEGACY_OWNER_KEY, userId)
+        raw = legacyData
+      }
+    }
+
     if (!raw) return createInitialBudgetData(demoMode)
     const parsed: unknown = JSON.parse(raw)
     return isBudgetData(parsed) ? parsed : createInitialBudgetData(demoMode)
@@ -81,12 +96,12 @@ export function loadBudgetData(demoMode = false): BudgetData {
   }
 }
 
-export function saveBudgetData(data: BudgetData) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+export function saveBudgetData(data: BudgetData, userId?: string) {
+  localStorage.setItem(storageKey(userId), JSON.stringify(data))
 }
 
-export function resetBudgetData(demoMode = false) {
+export function resetBudgetData(demoMode = false, userId?: string) {
   const data = createInitialBudgetData(demoMode)
-  saveBudgetData(data)
+  saveBudgetData(data, userId)
   return data
 }
